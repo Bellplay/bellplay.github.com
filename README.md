@@ -1,1 +1,1 @@
-# bellplay.github.com
+# bellplay.github.io
