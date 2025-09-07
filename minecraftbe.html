@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>方块生存 - 我的世界服务器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6cff6c',
+                        secondary: '#4787ff',
+                        accent: '#ff6b6b',
+                        dark: '#0f0c29',
+                        'dark-blue': '#302b63',
+                        'darker-blue': '#24243e',
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 0 15px rgba(108, 255, 108, 0.5);
+            }
+            .glow {
+                box-shadow: 0 0 20px rgba(108, 255, 108, 0.7);
+            }
+            .backdrop-blur {
+                backdrop-filter: blur(10px);
+            }
+            .parallax-bg {
+                background-attachment: fixed;
+                background-position: center;
+                background-repeat: no-repeat;
+                background-size: cover;
+            }
+            .animate-float {
+                animation: float 6s ease-in-out infinite;
+            }
+            @keyframes float {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-20px); }
+            }
+        }
+    </style>
+</head>
+<body class="font-inter bg-gradient-to-br from-dark to-darker-blue text-white min-h-screen">
+    <!-- 导航栏 -->
+    <header class="fixed top-0 left-0 w-full z-50 transition-all duration-300" id="navbar">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="#" class="flex items-center space-x-2">
+                <i class="fa fa-cube text-primary text-2xl"></i>
+                <span class="text-xl font-bold">方块生存</span>
+            </a>
+            
+            <!-- 桌面导航 -->
+            <nav class="hidden md:flex items-center space-x-8">
+                <a href="#" class="text-white hover:text-primary transition-colors">首页</a>
+                <a href="#modes" class="text-white hover:text-primary transition-colors">玩法</a>
+                <a href="#features" class="text-white hover:text-primary transition-colors">特色</a>
+                <a href="#stats" class="text-white hover:text-primary transition-colors">服务器状态</a>
+                <a href="#download" class="text-white hover:text-primary transition-colors">下载</a>
+            </nav>
+            
+            <!-- 移动端菜单按钮 -->
+            <button class="md:hidden text-white text-xl" id="menuToggle">
+                <i class="fa fa-bars"></i>
+            </button>
+        </div>
+        
+        <!-- 移动端导航菜单 -->
+        <div class="md:hidden bg-dark-blue/90 backdrop-blur absolute w-full left-0 top-full transform -translate-y-full opacity-0 transition-all duration-300 pointer-events-none" id="mobileMenu">
+            <div class="container mx-auto px-4 py-3 flex flex-col space-y-4">
+                <a href="#" class="text-white hover:text-primary transition-colors py-2">首页</a>
+                <a href="#modes" class="text-white hover:text-primary transition-colors py-2">玩法</a>
+                <a href="#features" class="text-white hover:text-primary transition-colors py-2">特色</a>
+                <a href="#stats" class="text-white hover:text-primary transition-colors py-2">服务器状态</a>
+                <a href="#download" class="text-white hover:text-primary transition-colors py-2">下载</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 英雄区域 -->
+    <section class="relative min-h-screen flex items-center justify-center overflow-hidden">
+        <div class="absolute inset-0 bg-dark-blue/50 z-10"></div>
+        <div class="absolute inset-0 z-0">
+            <div id="particles-js" class="absolute inset-0"></div>
+        </div>
+        
+        <div class="container mx-auto px-4 z-20 text-center">
+            <h1 class="text-[clamp(2.5rem,5vw,4rem)] font-bold mb-6 text-shadow">
+                <span class="bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">方块生存</span>
+                <span class="block mt-2 text-[clamp(1.5rem,3vw,2.5rem)]">我的世界服务器</span>
+            </h1>
+            
+            <p class="text-[clamp(1rem,2vw,1.25rem)] text-gray-300 max-w-2xl mx-auto mb-8">
+                极致生存挑战，千万玩家的选择！在这里体验最真实的方块世界，与全球玩家一起探索、建造、冒险
+            </p>
+            
+            <div class="flex flex-col sm:flex-row justify-center gap-4 mb-10">
+                <a href="#join" class="px-8 py-3 bg-gradient-to-r from-primary to-secondary text-dark font-bold rounded-full hover:glow transform hover:scale-105 transition-all duration-300">
+                    <i class="fa fa-play mr-2"></i> 立即加入
+                </a>
+                <a href="#modes" class="px-8 py-3 bg-transparent border-2 border-primary text-primary font-bold rounded-full hover:bg-primary/10 transform hover:scale-105 transition-all duration-300">
+                    <i class="fa fa-info-circle mr-2"></i> 了解玩法
+                </a>
+            </div>
+            
+            <!-- 服务器状态 -->
+            <div class="bg-dark-blue/70 backdrop-blur rounded-xl p-6 max-w-2xl mx-auto border border-primary/30">
+                <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <div id="serverStatusIcon" class="w-4 h-4 rounded-full bg-red-500"></div>
+                        <span id="serverStatusText">服务器状态: <span class="text-red-500">离线</span></span>
+                    </div>
+                    
+                    <div class="flex items-center gap-3">
+                        <i class="fa fa-users text-primary"></i>
+                        <span id="onlinePlayers">在线人数: 0/300</span>
+                    </div>
+                    
+                    <div class="w-full md:w-auto">
+                        <div class="flex">
+                            <input type="text" id="serverIP" value="mc.survivalcraft.com" readonly class="bg-darker-blue/80 px-4 py-2 rounded-l-lg w-full text-sm">
+                            <button id="copyIPBtn" class="bg-primary text-dark px-4 py-2 rounded-r-lg hover:bg-primary/80 transition-colors">
+                                <i class="fa fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-20 animate-bounce">
+            <a href="#modes" class="text-white/70 hover:text-white">
+                <i class="fa fa-chevron-down text-2xl"></i>
+            </a>
+        </div>
+    </section>
+
+    <!-- 玩法介绍 -->
+    <section id="modes" class="py-20 bg-darker-blue/50 relative">
+        <div class="container mx-auto px-4">
+            <h2 class="text-[clamp(1.8rem,3vw,2.5rem)] font-bold text-center mb-16">
+                <i class="fa fa-trophy text-primary mr-2"></i> 特色生存挑战玩法
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- 玩法卡片1 -->
+                <div class="bg-dark-blue/30 backdrop-blur rounded-xl p-6 border border-primary/20 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 transform hover:-translate-y-2">
+                    <div class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mb-6">
+                        <i class="fa fa-heart-broken text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">极限生存模式</h3>
+                    <p class="text-gray-300">单人生存挑战，死亡即删档，资源有限区域探索。每一次冒险都充满风险，只有最聪明的玩家才能在这个残酷的世界中生存下来。</p>
+                </div>
+                
+                <!-- 玩法卡片2 -->
+                <div class="bg-dark-blue/30 backdrop-blur rounded-xl p-6 border border-primary/20 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 transform hover:-translate-y-2">
+                    <div class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mb-6">
+                        <i class="fa fa-flag-checkered text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">荒野求生竞赛</h3>
+                    <p class="text-gray-300">限时生存挑战，收集资源完成任务，赢取丰厚奖励。与其他玩家竞争，展示你的生存技巧和策略思维。</p>
+                </div>
+                
+                <!-- 玩法卡片3 -->
+                <div class="bg-dark-blue/30 backdrop-blur rounded-xl p-6 border border-primary/20 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 transform hover:-translate-y-2">
+                    <div class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mb-6">
+                        <i class="fa fa-chest text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">资源争夺战</h3>
+                    <p class="text-gray-300">岛屿地图资源抢夺，建造防御基地，整点刷新宝箱。与队友合作，争夺有限的资源，成为岛屿的霸主。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 服务器特色 -->
+    <section id="features" class="py-20 relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-dark-blue to-darker-blue opacity-80"></div>
+        <div class="container mx-auto px-4 relative z-10">
+            <h2 class="text-[clamp(1.8rem,3vw,2.5rem)] font-bold text-center mb-16">
+                <i class="fa fa-star text-primary mr-2"></i> 服务器特色
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div class="order-2 md:order-1">
+                    <div class="space-y-8">
+                        <div class="flex gap-4">
+                            <div class="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center shrink-0">
+                                <i class="fa fa-rocket text-primary"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold mb-2">高性能服务器</h3>
+                                <p class="text-gray-300">采用顶级硬件配置，专业优化的服务端，确保游戏流畅运行，延迟低，不掉线。</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex gap-4">
+                            <div class="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center shrink-0">
+                                <i class="fa fa-shield text-primary"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold mb-2">严格反作弊系统</h3>
+                                <p class="text-gray-300">多重反作弊机制，确保公平的游戏环境。所有玩家均需经过严格审核，违规行为将受到严厉处罚。</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex gap-4">
+                            <div class="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center shrink-0">
+                                <i class="fa fa-comments text-primary"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold mb-2">活跃友好的社区</h3>
+                                <p class="text-gray-300">来自全球各地的玩家组成的友好社区，随时提供帮助和支持。定期举办社区活动，增进玩家之间的交流。</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex gap-4">
+                            <div class="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center shrink-0">
+                                <i class="fa fa-wrench text-primary"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold mb-2">持续更新与优化</h3>
+                                <p class="text-gray-300">定期更新游戏内容和功能，根据玩家反馈持续优化服务器性能和游戏体验。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="order-1 md:order-2 flex justify-center">
+                    <img src="https://syimg.3dmgame.com/uploadimg/upload/image/20250516/20250516095751_56502.jpg" alt="我的世界游戏截图" class="rounded-xl shadow-2xl max-w-full h-auto animate-float">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 服务器状态统计 -->
+    <section id="stats" class="py-20 bg-darker-blue/50">
+        <div class="container mx-auto px-4">
+            <h2 class="text-[clamp(1.8rem,3vw,2.5rem)] font-bold text-center mb-16">
+                <i class="fa fa-line-chart text-primary mr-2"></i> 服务器统计
+            </h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+                <!-- 在线人数图表 -->
+                <div class="bg-dark-blue/30 backdrop-blur rounded-xl p-6 border border-primary/20">
+                    <h3 class="text-xl font-bold mb-4">在线人数趋势</h3>
+                    <div class="h-80">
+                        <canvas id="playerChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- 服务器性能指标 -->
+                <div class="bg-dark-blue/30 backdrop-blur rounded-xl p-6 border border-primary/20">
+                    <h3 class="text-xl font-bold mb-4">服务器性能</h3>
+                    <div class="space-y-6">
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span>CPU 使用率</span>
+                                <span id="cpuUsage">--</span>
+                            </div>
+                            <div class="w-full bg-darker-blue/50 rounded-full h-2.5">
+                                <div id="cpuBar" class="bg-primary h-2.5 rounded-full" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span>内存使用率</span>
+                                <span id="memoryUsage">--</span>
+                            </div>
+                            <div class="w-full bg-darker-blue/50 rounded-full h-2.5">
+                                <div id="memoryBar" class="bg-secondary h-2.5 rounded-full" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span>网络延迟</span>
+                                <span id="networkLatency">--</span>
+                            </div>
+                            <div class="w-full bg-darker-blue/50 rounded-full h-2.5">
+                                <div id="networkBar" class="bg-accent h-2.5 rounded-full" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 服务器数据卡片 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-dark-blue/30 backdrop-blur rounded-xl p-6 border border-primary/20 text-center">
+                    <div class="text-4xl font-bold text-primary mb-2" id="totalPlayers">0</div>
+                    <div class="text-gray-300">总注册玩家</div>
+                </div>
+                
+                <div class="bg-dark-blue/30 backdrop-blur rounded-xl p-6 border border-primary/20 text-center">
+                    <div class="text-4xl font-bold text-primary mb-2" id="maxPlayers">0</div>
+                    <div class="text-gray-300">历史最高在线</div>
+                </div>
+                
+                <div class="bg-dark-blue/30 backdrop-blur rounded-xl p-6 border border-primary/20 text-center">
+                    <div class="text-4xl font-bold text-primary mb-2" id="worldSize">0</div>
+                    <div class="text-gray-300">世界大小 (GB)</div>
+                </div>
+                
+                <div class="bg-dark-blue/30 backdrop-blur rounded-xl p-6 border border-primary/20 text-center">
+                    <div class="text-4xl font-bold text-primary mb-2" id="uptime">0</div>
+                    <div class="text-gray-300">连续运行 (天)</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 加入服务器 -->
+    <section id="join" class="py-20 relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-dark to-dark-blue opacity-90"></div>
+        <div class="absolute inset-0" style="background-image: url('https://picsum.photos/id/2/1920/1080'); background-size: cover; background-position: center; opacity: 0.1;"></div>
+        
+        <div class="container mx-auto px-4 relative z-10">
+            <div class="max-w-3xl mx-auto text-center">
+                <h2 class="text-[clamp(1.8rem,3vw,2.5rem)] font-bold mb-6">
+                    <i class="fa fa-sign-in text-primary mr-2"></i> 立即加入方块生存
+                </h2>
+                
+                <p class="text-gray-300 mb-10">
+                    准备好开始你的冒险了吗？加入我们的服务器，体验前所未有的我的世界生存挑战！
+                </p>
+                
+                <div class="bg-dark-blue/50 backdrop-blur rounded-2xl p-8 border border-primary/30">
+                    <div class="space-y-6">
+                        <div class="text-center mb-8">
+                            <div class="text-2xl font-bold mb-2" id="currentPlayers">0</div>
+                            <div class="text-gray-400">玩家正在在线游戏</div>
+                        </div>
+                        
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <input type="text" id="joinServerIP" value="mc.survivalcraft.com" readonly class="flex-1 bg-darker-blue/80 px-4 py-3 rounded-lg text-center">
+                            <button id="joinCopyBtn" class="px-6 py-3 bg-primary text-dark font-bold rounded-lg hover:bg-primary/80 transition-colors">
+                                <i class="fa fa-copy mr-2"></i> 复制IP
+                            </button>
+                        </div>
+                        
+                        <div class="text-left">
+                            <h3 class="text-lg font-bold mb-3">加入步骤：</h3>
+                            <ol class="list-decimal list-inside space-y-2 text-gray-300">
+                                <li>打开我的世界游戏，选择"多人游戏"</li>
+                                <li>点击"添加服务器"</li>
+                                <li>在服务器名称中输入"方块生存"</li>
+                                <li>将上面的服务器IP复制到"服务器地址"</li>
+                                <li>点击"完成"，然后选择服务器并点击"加入服务器"</li>
+                            </ol>
+                        </div>
+                        
+                        <div class="text-center">
+                            <a href="#download" class="inline-block px-8 py-3 bg-gradient-to-r from-primary to-secondary text-dark font-bold rounded-full hover:glow transform hover:scale-105 transition-all duration-300">
+                                <i class="fa fa-download mr-2"></i> 下载我的世界
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 下载区域 -->
+    <section id="download" class="py-20 bg-darker-blue/50">
+        <div class="container mx-auto px-4">
+            <h2 class="text-[clamp(1.8rem,3vw,2.5rem)] font-bold text-center mb-16">
+                <i class="fa fa-download text-primary mr-2"></i> 游戏下载
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- 官方客户端 -->
+                <div class="bg-dark-blue/30 backdrop-blur rounded-xl p-6 border border-primary/20 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 text-center">
+                    <div class="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fa fa-gamepad text-primary text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">官方客户端</h3>
+                    <p class="text-gray-300 mb-6">下载官方我的世界游戏客户端，支持多人联机游戏。</p>
+                    <a href="#" class="inline-block px-6 py-2 bg-primary/20 text-primary rounded-lg hover:bg-primary/30 transition-colors">
+                        <i class="fa fa-download mr-2"></i> 下载
+                    </a>
+                </div>
+                
+                <!-- 整合包 -->
+                <div class="bg-dark-blue/30 backdrop-blur rounded-xl p-6 border border-primary/20 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 text-center">
+                    <div class="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fa fa-cubes text-primary text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">整合包</h3>
+                    <p class="text-gray-300 mb-6">包含服务器优化模组的整合包，提供更流畅的游戏体验。</p>
+                    <a href="#" class="inline-block px-6 py-2 bg-primary/20 text-primary rounded-lg hover:bg-primary/30 transition-colors">
+                        <i class="fa fa-download mr-2"></i> 下载
+                    </a>
+                </div>
+                
+                <!-- 手机版 -->
+                <div class="bg-dark-blue/30 backdrop-blur rounded-xl p-6 border border-primary/20 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 text-center">
+                    <div class="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fa fa-mobile text-primary text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">手机版</h3>
+                    <p class="text-gray-300 mb-6">我的世界基岩版，支持安卓和iOS设备，与Java版互通。</p>
+                    <a href="#" class="inline-block px-6 py-2 bg-primary/20 text-primary rounded-lg hover:bg-primary/30 transition-colors">
+                        <i class="fa fa-download mr-2"></i> 下载
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 社区展示 -->
+    <section class="py-20 bg-dark-blue/30">
+        <div class="container mx-auto px-4">
+            <h2 class="text-[clamp(1.8rem,3vw,2.5rem)] font-bold text-center mb-16">
+                <i class="fa fa-users text-primary mr-2"></i> 活跃社区
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- 社区卡片1 -->
+                <div class="bg-darker-blue/50 backdrop-blur rounded-xl overflow-hidden">
+                    <img src="https://newsimg.5054399.com/uploads/litimg/230220/1516046353P8.jpg" alt="社区活动" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2">每周建筑大赛</h3>
+                        <p class="text-gray-300 mb-4">展示你的建筑才华，赢取游戏内奖励和社区荣誉！</p>
+                        <a href="#" class="text-primary hover:text-primary/80 inline-flex items-center">
+                            查看详情 <i class="fa fa-arrow-right ml-2"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- 社区卡片2 -->
+                <div class="bg-darker-blue/50 backdrop-blur rounded-xl overflow-hidden">
+                    <img src="https://newsimg.5054399.com/uploads/litimg/230209/1023446354057.jpg" alt="玩家基地" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2">玩家基地展示</h3>
+                        <p class="text-gray-300 mb-4">探索社区成员建造的惊人基地和创意作品！</p>
+                        <a href="#" class="text-primary hover:text-primary/80 inline-flex items-center">
+                            查看详情 <i class="fa fa-arrow-right ml-2"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- 社区卡片3 -->
+                <div class="bg-darker-blue/50 backdrop-blur rounded-xl overflow-hidden">
+                    <img src="https://newsimg.5054399.com/uploads/litimg/221115/1531526351952.jpg" alt="服务器活动" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2">周末冒险活动</h3>
+                        <p class="text-gray-300 mb-4">参与刺激的团队冒险，挑战强大的BOSS！</p>
+                        <a href="#" class="text-primary hover:text-primary/80 inline-flex items-center">
+                            查看详情 <i class="fa fa-arrow-right ml-2"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- 社区卡片4 -->
+                <div class="bg-darker-blue/50 backdrop-blur rounded-xl overflow-hidden">
+                    <img src="https://newsimg.5054399.com/uploads/litimg/220601/154I15FC94.jpg" alt="玩家论坛" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2">玩家论坛</h3>
+                        <p class="text-gray-300 mb-4">加入我们的论坛，与其他玩家交流心得和建议！</p>
+                        <a href="#" class="text-primary hover:text-primary/80 inline-flex items-center">
+                            查看详情 <i class="fa fa-arrow-right ml-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <i class="fa fa-cube text-primary text-2xl"></i>
+                        <span class="text-xl font-bold">方块生存</span>
+                    </div>
+                    <p class="text-gray-400 mb-4">极致生存挑战，千万玩家的选择！</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-primary transition-colors">
+                            <i class="fa fa-discord"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-primary transition-colors">
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-primary transition-colors">
+                            <i class="fa fa-youtube-play"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-primary transition-colors">
+                            <i class="fa fa-instagram"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-bold mb-4">快速链接</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-primary transition-colors">首页</a></li>
+                        <li><a href="#modes" class="text-gray-400 hover:text-primary transition-colors">玩法</a></li>
+                        <li><a href="#features" class="text-gray-400 hover:text-primary transition-colors">特色</a></li>
+                        <li><a href="#stats" class="text-gray-400 hover:text-primary transition-colors">服务器状态</a></li>
+                        <li><a href="#download" class="text-gray-400 hover:text-primary transition-colors">下载</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-bold mb-4">支持</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-primary transition-colors">常见问题</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-primary transition-colors">规则</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-primary transition-colors">联系我们</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-primary transition-colors">举报玩家</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-primary transition-colors">捐赠支持</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-bold mb-4">联系我们</h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-center text-gray-400">
+                            <i class="fa fa-envelope text-primary mr-2"></i>
+                            <a href="mailto:support@survivalcraft.com" class="hover:text-primary transition-colors">support@survivalcraft.com</a>
+                        </li>
+                        <li class="flex items-center text-gray-400">
+                            <i class="fa fa-discord text-primary mr-2"></i>
+                            <a href="#" class="hover:text-primary transition-colors">加入Discord</a>
+                        </li>
+                        <li class="flex items-center text-gray-400">
+                            <i class="fa fa-server text-primary mr-2"></i>
+                            <span>mc.survivalcraft.com</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 pt-8 text-center text-gray-500 text-sm">
+                <p>© 2024 方块生存服务器. 保留所有权利.</p>
+                <p class="mt-2">本网站与Mojang Studios无关联.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 粒子效果库 -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    
+    <!-- 主脚本 -->
+    <script>
+        // 导航栏滚动效果
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('bg-dark/90', 'backdrop-blur', 'shadow-lg');
+            } else {
+                navbar.classList.remove('bg-dark/90', 'backdrop-blur', 'shadow-lg');
+            }
+        });
+        
+        // 移动端菜单切换
+        document.getElementById('menuToggle').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            if (mobileMenu.classList.contains('opacity-0')) {
+                mobileMenu.classList.remove('opacity-0', '-translate-y-full', 'pointer-events-none');
+                mobileMenu.classList.add('opacity-100', 'translate-y-0', 'pointer-events-auto');
+                document.getElementById('menuToggle').innerHTML = '<i class="fa fa-times"></i>';
+            } else {
+                mobileMenu.classList.add('opacity-0', '-translate-y-full', 'pointer-events-none');
+                mobileMenu.classList.remove('opacity-100', 'translate-y-0', 'pointer-events-auto');
+                document.getElementById('menuToggle').innerHTML = '<i class="fa fa-bars"></i>';
+            }
+        });
+        
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                // 关闭移动端菜单
+                const mobileMenu = document.getElementById('mobileMenu');
+                if (!mobileMenu.classList.contains('opacity-0')) {
+                    mobileMenu.classList.add('opacity-0', '-translate-y-full', 'pointer-events-none');
+                    mobileMenu.classList.remove('opacity-100', 'translate-y-0', 'pointer-events-auto');
+                    document.getElementById('menuToggle').innerHTML = '<i class="fa fa-bars"></i>';
+                }
+                
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+        
+        // 复制IP功能
+        document.getElementById('copyIPBtn').addEventListener('click', function() {
+            const copyText = document.getElementById('serverIP');
+            copyText.select();
+            document.execCommand('copy');
+            
+            const originalText = this.innerHTML;
+            this.innerHTML = '<i class="fa fa-check"></i> 已复制';
+            
+            setTimeout(() => {
+                this.innerHTML = originalText;
+            }, 2000);
+        });
+        
+        document.getElementById('joinCopyBtn').addEventListener('click', function() {
+            const copyText = document.getElementById('joinServerIP');
+            copyText.select();
+            document.execCommand('copy');
+            
+            const originalText = this.innerHTML;
+            this.innerHTML = '<i class="fa fa-check"></i> 已复制';
+            
+            setTimeout(() => {
+                this.innerHTML = originalText;
+            }, 2000);
+        });
+        
+        // 粒子效果配置
+        particlesJS('particles-js', {
+            "particles": {
+                "number": {
+                    "value": 80,
+                    "density": {
+                        "enable": true,
+                        "value_area": 800
+                    }
+                },
+                "color": {
+                    "value": "#6cff6c"
+                },
+                "shape": {
+                    "type": "circle",
+                    "stroke": {
+                        "width": 0,
+                        "color": "#000000"
+                    },
+                    "polygon": {
+                        "nb_sides": 5
+                    }
+                },
+                "opacity": {
+                    "value": 0.5,
+                    "random": false,
+                    "anim": {
+                        "enable": false,
+                        "speed": 1,
+                        "opacity_min": 0.1,
+                        "sync": false
+                    }
+                },
+                "size": {
+                    "value": 3,
+                    "random": true,
+                    "anim": {
+                        "enable": false,
+                        "speed": 40,
+                        "size_min": 0.1,
+                        "sync": false
+                    }
+                },
+                "line_linked": {
+                    "enable": true,
+                    "distance": 150,
+                    "color": "#6cff6c",
+                    "opacity": 0.4,
+                    "width": 1
+                },
+                "move": {
+                    "enable": true,
+                    "speed": 2,
+                    "direction": "none",
+                    "random": false,
+                    "straight": false,
+                    "out_mode": "out",
+                    "bounce": false,
+                    "attract": {
+                        "enable": false,
+                        "rotateX": 600,
+                        "rotateY": 1200
+                    }
+                }
+            },
+            "interactivity": {
+                "detect_on": "canvas",
+                "events": {
+                    "onhover": {
+                        "enable": true,
+                        "mode": "grab"
+                    },
+                    "onclick": {
+                        "enable": true,
+                        "mode": "push"
+                    },
+                    "resize": true
+                },
+                "modes": {
+                    "grab": {
+                        "distance": 140,
+                        "line_linked": {
+                            "opacity": 1
+                        }
+                    },
+                    "bubble": {
+                        "distance": 400,
+                        "size": 40,
+                        "duration": 2,
+                        "opacity": 8,
+                        "speed": 3
+                    },
+                    "repulse": {
+                        "distance": 200,
+                        "duration": 0.4
+                    },
+                    "push": {
+                        "particles_nb": 4
+                    },
+                    "remove": {
+                        "particles_nb": 2
+                    }
+                }
+            },
+            "retina_detect": true
+        });
+        
+        // 在线人数图表
+        const ctx = document.getElementById('playerChart').getContext('2d');
+        const playerChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '现在'],
+                datasets: [{
+                    label: '在线玩家',
+                    data: [45, 28, 50, 90, 65, 120, 85],
+                    borderColor: '#6cff6c',
+                    backgroundColor: 'rgba(108, 255, 108, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        backgroundColor: 'rgba(48, 43, 99, 0.9)',
+                        titleColor: '#fff',
+                        bodyColor: '#ddd',
+                        borderColor: '#6cff6c',
+                        borderWidth: 1
+                    }
+                },
+                scales:
