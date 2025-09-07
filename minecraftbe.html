@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>方块生存 - 我的世界服务器</title>
+    <title>铃铛玩 - 我的世界服务器</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
@@ -66,7 +66,7 @@
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
             <a href="#" class="flex items-center space-x-2">
                 <i class="fa fa-cube text-primary text-2xl"></i>
-                <span class="text-xl font-bold">方块生存</span>
+                <span class="text-xl font-bold">铃铛玩的服务器</span>
             </a>
             
             <!-- 桌面导航 -->
@@ -105,7 +105,7 @@
         
         <div class="container mx-auto px-4 z-20 text-center">
             <h1 class="text-[clamp(2.5rem,5vw,4rem)] font-bold mb-6 text-shadow">
-                <span class="bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">方块生存</span>
+                <span class="bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">我的世界服务器</span>
                 <span class="block mt-2 text-[clamp(1.5rem,3vw,2.5rem)]">我的世界服务器</span>
             </h1>
             
@@ -127,7 +127,7 @@
                 <div class="flex flex-col md:flex-row items-center justify-between gap-4">
                     <div class="flex items-center gap-3">
                         <div id="serverStatusIcon" class="w-4 h-4 rounded-full bg-red-500"></div>
-                        <span id="serverStatusText">服务器状态: <span class="text-red-500">离线</span></span>
+                        <span id="serverStatusText">服务器状态: <span class="text-green-500">在线</span></span>
                     </div>
                     
                     <div class="flex items-center gap-3">
@@ -167,8 +167,8 @@
                     <div class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mb-6">
                         <i class="fa fa-heart-broken text-primary text-2xl"></i>
                     </div>
-                    <h3 class="text-xl font-bold mb-3">极限生存模式</h3>
-                    <p class="text-gray-300">单人生存挑战，死亡即删档，资源有限区域探索。每一次冒险都充满风险，只有最聪明的玩家才能在这个残酷的世界中生存下来。</p>
+                    <h3 class="text-xl font-bold mb-3">合作生存</h3>
+                    <p class="text-gray-300">合作生存，挑战困难，在资源有限区域探索。每一次冒险都充满风险，只有合作才能在这个残酷的世界中生存下来。</p>
                 </div>
                 
                 <!-- 玩法卡片2 -->
@@ -186,7 +186,7 @@
                         <i class="fa fa-chest text-primary text-2xl"></i>
                     </div>
                     <h3 class="text-xl font-bold mb-3">资源争夺战</h3>
-                    <p class="text-gray-300">岛屿地图资源抢夺，建造防御基地，整点刷新宝箱。与队友合作，争夺有限的资源，成为岛屿的霸主。</p>
+                    <p class="text-gray-300">地图资源抢夺，建造防御基地，整点刷新宝箱。与队友合作，争夺有限的资源，成为霸主。</p>
                 </div>
             </div>
         </div>
@@ -358,14 +358,22 @@
                                 <i class="fa fa-copy mr-2"></i> 复制IP
                             </button>
                         </div>
+                        <div class="text-left">
+                            <h3 class="text-lg font-bold mb-3">注释：</h3>
+                            <ol class="list-decimal list-inside space-y-2 text-gray-300">
+                           <li>版本为基岩版1.21.101.1</li>
+                          </ol>
+                        </div>
                         
                         <div class="text-left">
                             <h3 class="text-lg font-bold mb-3">加入步骤：</h3>
                             <ol class="list-decimal list-inside space-y-2 text-gray-300">
                                 <li>打开我的世界游戏，选择"多人游戏"</li>
+                                <li>点击"服务器"</li>
                                 <li>点击"添加服务器"</li>
-                                <li>在服务器名称中输入"方块生存"</li>
-                                <li>将上面的服务器IP复制到"服务器地址"</li>
+                                <li>在服务器名称中输入"铃铛的服务器"</li>
+                                <li>将上面的服务器IP中":前面的复制到"服务器地址"</li>
+                                <li>将上面的服务器IP中":冒号后面的"复制到"服务器端口"</li>
                                 <li>点击"完成"，然后选择服务器并点击"加入服务器"</li>
                             </ol>
                         </div>
@@ -396,7 +404,7 @@
                     </div>
                     <h3 class="text-xl font-bold mb-3">官方客户端</h3>
                     <p class="text-gray-300 mb-6">下载官方我的世界游戏客户端，支持多人联机游戏。</p>
-                    <a href="#" class="inline-block px-6 py-2 bg-primary/20 text-primary rounded-lg hover:bg-primary/30 transition-colors">
+                    <a href="https://www.minecraft.net/zh-hans/download" class="inline-block px-6 py-2 bg-primary/20 text-primary rounded-lg hover:bg-primary/30 transition-colors">
                         <i class="fa fa-download mr-2"></i> 下载
                     </a>
                 </div>
@@ -419,7 +427,7 @@
                         <i class="fa fa-mobile text-primary text-3xl"></i>
                     </div>
                     <h3 class="text-xl font-bold mb-3">手机版</h3>
-                    <p class="text-gray-300 mb-6">我的世界基岩版，支持安卓和iOS设备，与Java版互通。</p>
+                    <p class="text-gray-300 mb-6">我的世界基岩版，支持安卓。</p>
                     <a href="#" class="inline-block px-6 py-2 bg-primary/20 text-primary rounded-lg hover:bg-primary/30 transition-colors">
                         <i class="fa fa-download mr-2"></i> 下载
                     </a>
@@ -494,7 +502,7 @@
                 <div>
                     <div class="flex items-center space-x-2 mb-4">
                         <i class="fa fa-cube text-primary text-2xl"></i>
-                        <span class="text-xl font-bold">方块生存</span>
+                        <span class="text-xl font-bold">铃铛的服务期</span>
                     </div>
                     <p class="text-gray-400 mb-4">极致生存挑战，千万玩家的选择！</p>
                     <div class="flex space-x-4">
@@ -532,6 +540,7 @@
                         <li><a href="#" class="text-gray-400 hover:text-primary transition-colors">联系我们</a></li>
                         <li><a href="#" class="text-gray-400 hover:text-primary transition-colors">举报玩家</a></li>
                         <li><a href="#" class="text-gray-400 hover:text-primary transition-colors">捐赠支持</a></li>
+                        <li><a href="https://s.fnnas.net/s/4bb2b433a7a44369b9" class="text-gray-400 hover:text-primary transition-colors">捐赠名单</a></li>
                     </ul>
                 </div>
                 
@@ -540,7 +549,7 @@
                     <ul class="space-y-2">
                         <li class="flex items-center text-gray-400">
                             <i class="fa fa-envelope text-primary mr-2"></i>
-                            <a href="mailto:support@survivalcraft.com" class="hover:text-primary transition-colors">support@survivalcraft.com</a>
+                            <a href="mailto:Bellplay@163.com" class="hover:text-primary transition-colors">support@survivalcraft.com</a>
                         </li>
                         <li class="flex items-center text-gray-400">
                             <i class="fa fa-discord text-primary mr-2"></i>
@@ -555,7 +564,7 @@
             </div>
             
             <div class="border-t border-gray-800 pt-8 text-center text-gray-500 text-sm">
-                <p>© 2024 方块生存服务器. 保留所有权利.</p>
+                <p>© 2025 铃铛的生存服务器. 保留所有权利.</p>
                 <p class="mt-2">本网站与Mojang Studios无关联.</p>
             </div>
         </div>
